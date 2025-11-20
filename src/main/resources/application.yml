@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: aggregate-service
+  cloud:
+    function:
+      definition: taskProcessor # Consumer 빈 이름
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+      bindings:
+        # [Consumer] 입력 (요청 받기)
+        taskProcessor-in-0:
+          destination: external-tasks
+          group: aggregate-worker-group
+          content-type: application/json
+
+        # [Producer] 출력 (결과 보내기) - @KafkaClient("task-result-out-0") 와 매핑
+        task-result-out-0:
+          destination: external-task-results
+          content-type: application/json
+
+# 네이버 API 설정 (발급받은 키 입력)
+external:
+  naver:
+    client-id: "YOUR_CLIENT_ID"
+    client-secret: "YOUR_CLIENT_SECRET"
