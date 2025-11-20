@@ -33,11 +33,26 @@ public class NaverGeocodeHandler implements ExternalTaskHandler<GeocodeRequest> 
     @Value("${external.naver.naver-geo-api-path}")
     private String apiPath;
 
+    /**
+     * Determines whether this handler can process the provided request class.
+     *
+     * @param requestClass the request class to test for compatibility with GeocodeRequest
+     * @return `true` if `GeocodeRequest` or a subclass is assignable from the provided class, `false` otherwise
+     */
     @Override
     public boolean supports(Class<?> requestClass) {
         return GeocodeRequest.class.isAssignableFrom(requestClass);
     }
 
+    /**
+     * Performs a Naver geocoding request for the given address and produces a TaskResultEvent.
+     *
+     * @param request the geocoding request containing the taskId and the address to resolve
+     * @return a TaskResultEvent with the original taskId and a status; on success the event's {@code resultData}
+     *         is either a {@code Map} with keys {@code "x"} (longitude), {@code "y"} (latitude), and {@code "roadAddress"},
+     *         if no address match was found the {@code resultData} is the string {@code NO_MATCH_FOUND},
+     *         and on error the {@code resultData} is the exception message
+     */
     @Override
     public Mono<TaskResultEvent> handle(GeocodeRequest request) {
         log.info("네이버 지오코딩 요청 시작: [TaskId: {}] 주소: {}", request.getTaskId(), request.getAddress());
@@ -78,8 +93,12 @@ public class NaverGeocodeHandler implements ExternalTaskHandler<GeocodeRequest> 
     }
 
     /**
-     * 네이버 응답 Map에서 좌표(x, y)만 추출하는 헬퍼 메서드
-     * Unchecked cast 경고를 억제합니다.
+     * Extracts longitude, latitude, and road address from a Naver geocoding API response map.
+     *
+     * @param response the parsed JSON response from the Naver geocoding API
+     * @return a Map containing keys "x" (longitude), "y" (latitude), and "roadAddress" when an address is found;
+     *         the String "NO_MATCH_FOUND" if the response contains no addresses;
+     *         otherwise returns the original response map when parsing fails
      */
     @SuppressWarnings("unchecked")
     private Object extractCoordinates(Map<String, Object> response) {

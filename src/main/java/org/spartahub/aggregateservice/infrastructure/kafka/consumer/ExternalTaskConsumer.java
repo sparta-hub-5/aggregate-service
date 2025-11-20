@@ -20,6 +20,15 @@ public class ExternalTaskConsumer {
     private final List<ExternalTaskHandler<?>> handlers;
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     private final TaskResultProducer resultProducer;
+    /**
+     * Creates a Consumer that dispatches a BaseTaskRequest to a matching ExternalTaskHandler and publishes the handler's resulting TaskResultEvent.
+     *
+     * The returned Consumer locates the first handler that supports the request's runtime class, invokes processing, and forwards any non-null result to the configured producer.
+     *
+     * @return a Consumer that accepts a BaseTaskRequest and processes it through a suitable ExternalTaskHandler
+     * @throws IllegalArgumentException if no handler supports the request's class
+     * @throws RuntimeException if an error occurs while processing or sending the task result
+     */
     @Bean
     public Consumer<BaseTaskRequest> taskProcessor() {
         return request -> {
@@ -42,8 +51,13 @@ public class ExternalTaskConsumer {
     }
 
     /**
-     * 제네릭 타입 캐스팅 문제를 해결하기 위한 헬퍼 메서드
-     * supports()로 검증했으므로 강제 형변환을 수행합니다.
+     * Processes the given task request using the provided handler and publishes the resulting TaskResultEvent to Kafka if one is produced.
+     *
+     * <p>The handler is cast to {@code ExternalTaskHandler<BaseTaskRequest>} (safe when {@code handler.supports(request.getClass())} has been validated),
+     * the handler's result is awaited, and a non-null result is sent via {@code resultProducer}.</p>
+     *
+     * @param handler the handler that supports the request's concrete type
+     * @param request the incoming task request to process
      */
     @SuppressWarnings("unchecked")
     private void processAndSend(ExternalTaskHandler<?> handler, BaseTaskRequest request) {
