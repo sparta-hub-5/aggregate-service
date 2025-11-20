@@ -12,8 +12,9 @@ import org.spartahub.aggregateservice.dto.response.TaskResultEvent;
 public interface TaskResultProducer {
 
     /**
-     * 처리 결과를 전송합니다.
-     * @param event 처리 결과 이벤트 객체
-     */
+ * Publish a TaskResultEvent to the configured Kafka destination (bound to "task-result-out-0").
+ *
+ * @param event the TaskResultEvent payload to send
+ */
     void sendResult(TaskResultEvent event);
 }
