@@ -1,5 +1,11 @@
 package org.spartahub.aggregateservice.domain;
 
-public record ExternalApiResponse(String body) {
 
-}
+import java.util.Map;
+
+public record ExternalApiResponse(
+    boolean success,
+    String errorCode,
+    String errorMessage,
+    Map<String, Object> payload
+) {}
