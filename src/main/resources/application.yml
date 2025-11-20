@@ -1,27 +1,54 @@
+server:
+  port: 8081
+
 spring:
   application:
     name: aggregate-service
+
   cloud:
     function:
-      definition: taskProcessor # Consumer 빈 이름
+      definition: taskProcessor
+
     stream:
       kafka:
         binder:
           brokers: localhost:9092
+          auto-create-topics: true
+          consumer-properties:
+            key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            value.deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+            spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+            spring.json.value.default.type: org.spartahub.aggregateservice.dto.request.BaseTaskRequest
+            spring.json.trusted.packages: "*"
+            spring.json.use.type.headers: false
+          producer-properties:
+            key.serializer: org.apache.kafka.common.serialization.StringSerializer
+            value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
       bindings:
-        # [Consumer] 입력 (요청 받기)
         taskProcessor-in-0:
-          destination: external-tasks
+          destination: delivery.sys.external-tasks
           group: aggregate-worker-group
           content-type: application/json
+          consumer:
+            use-native-decoding: true
 
-        # [Producer] 출력 (결과 보내기) - @KafkaClient("task-result-out-0") 와 매핑
         task-result-out-0:
-          destination: external-task-results
+          destination: delivery.sys.external-results
           content-type: application/json
+          producer:
+            use-native-encoding: true
 
-# 네이버 API 설정 (발급받은 키 입력)
 external:
   naver:
-    client-id: "YOUR_CLIENT_ID"
-    client-secret: "YOUR_CLIENT_SECRET"
+    client-id: ${NAVER_CLIENT_ID}
+    client-secret: ${NAVER_CLIENT_SECRET}
+    naver-api-host: ${NAVER_API_HOST}
+    naver-geo-api-path: ${NAVER_GEO_API_PATH}
+    naver-directions5-api-path: ${NAVER_DIRECTIONS5_API_PATH}
+
+
+logging:
+  level:
+    org.springframework.cloud.stream: INFO
+    org.spartahub: DEBUG
