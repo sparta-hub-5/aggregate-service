@@ -22,7 +22,7 @@ repositories {
 ext {
     set('springCloudVersion', "2025.0.0")
     // BOM이 버전을 찾지 못할 때를 대비하여 안정적인 Stream 버전 명시
-    set('streamKafkaVersion', "4.1.3")
+    set('streamKafkaVersion', "4.3.0")
 }
 
 configurations {
@@ -37,7 +37,7 @@ dependencies {
 
     // --- [2] 공용 모듈 (msa-common) ---
     // 공용 모듈은 동기(Tomcat) 기반이므로, WebFlux와 충돌하는 의존성을 제거합니다.
-    implementation('com.github.hiho1010:msa-common:v0.1.0') {
+    implementation('com.github.hiho1010:msa-common:v0.1.1') {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
     }
