@@ -18,6 +18,7 @@ public class ExternalTaskConsumer {
 
     // Raw type 대신 와일드카드 사용 권장
     private final List<ExternalTaskHandler<?>> handlers;
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     private final TaskResultProducer resultProducer;
     @Bean
     public Consumer<BaseTaskRequest> taskProcessor() {
