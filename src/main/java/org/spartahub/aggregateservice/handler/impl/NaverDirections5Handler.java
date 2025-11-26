@@ -89,25 +89,25 @@ public class NaverDirections5Handler implements ExternalTaskHandler<Directions5R
             if (routeList == null || routeList.isEmpty()) return "NO_ROUTE_OPTION_FOUND";
 
             // 첫 번째 경로가 최적 경로
-            Map<String, Object> bestRoute = routeList.get(0);
+            Map<String, Object> bestRoute = routeList.getFirst();
             Map<String, Object> summary = (Map<String, Object>) bestRoute.get("summary");
 
             if (summary == null) return "NO_SUMMARY_FOUND";
 
-            Map<String, Object> startInfo = (Map<String, Object>) summary.get("start");
-            Map<String, Object> goalInfo = (Map<String, Object>) summary.get("goal");
-            Integer duration = (Integer) summary.get("duration");
-            Integer distance = (Integer) summary.get("distance");
-            Integer taxiFare = (Integer) summary.get("taxiFare");
-            Integer fuelPrice = (Integer) summary.get("fuelPrice");
+            // 원본 데이터 추출 (네이버 API: duration=밀리초, distance=미터)
+            Integer durationMs = (Integer) summary.get("duration");
+            Integer distanceMeters = (Integer) summary.get("distance");
 
+            // 1. duration: 밀리초 -> 분 (나눗셈 몫만 취함)
+            long durationMinutes = durationMs != null ? durationMs / 60000 : 0;
+
+            // 2. distance: 미터 -> km (소수점 유지를 위해 1000.0으로 나눔)
+            double distanceKm = distanceMeters != null ? distanceMeters / 1000.0 : 0.0;
+
+            // 요청하신 대로 두 필드만 반환
             return Map.of(
-                "start", startInfo != null ? startInfo : "N/A",
-                "goal", goalInfo != null ? goalInfo : "N/A",
-                "duration", duration != null ? duration : 0,
-                "distance", distance != null ? distance : 0,
-                "taxiFare", taxiFare != null ? taxiFare : 0,
-                "fuelPrice", fuelPrice != null ? fuelPrice : 0
+                "duration", durationMinutes,
+                "distance", distanceKm
             );
 
         } catch (Exception e) {
