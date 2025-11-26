@@ -8,5 +8,11 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 public class Directions5Request extends BaseTaskRequest {
-    private String address;
+    private String start;
+
+    private String goal;
+
+    private String waypoints;
+
+    private String option;
 }

@@ -37,7 +37,7 @@ dependencies {
 
     // --- [2] 공용 모듈 (msa-common) ---
     // 공용 모듈은 동기(Tomcat) 기반이므로, WebFlux와 충돌하는 의존성을 제거합니다.
-    implementation('com.github.hiho1010:msa-common:v0.1.1') {
+    implementation('com.github.hiho1010:msa-common:v0.1.2') {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
     }
